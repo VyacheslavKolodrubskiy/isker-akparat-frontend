@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  vue:
+    container_name: "${APP_NAME}_${APP_ENV}_frontend"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    restart: always
+    volumes:
+      - ./:/app
+    ports:
+      - '8180:80'
+    env_file:
+      - .env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${APP_NAME}_${APP_ENV}_frontend.entrypoints=http,https
+      - traefik.http.routers.${APP_NAME}_${APP_ENV}_frontend.rule=Host(`erp.iqid.kz`)
+      - traefik.http.routers.${APP_NAME}_${APP_ENV}_frontend.tls=true
+      - traefik.http.routers.${APP_NAME}_${APP_ENV}_frontend.tls.certresolver=production
+      - traefik.http.services.iqid-frontend-service.loadbalancer.server.port=80
+    networks:
+      - web
+      - isker
+networks:
+  isker:
+    external: false
+  web:
+    external: true
+
